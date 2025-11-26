@@ -1,14 +1,19 @@
-from app import app
+# seed.py
+from app import app  # Import app directly, not create_app
 from models import db, User, Workout, Exercise, WorkoutItem
 from datetime import date
 
+# Remove this line - no create_app() function exists
+# app = create_app()
+
 with app.app_context():
+    print("Dropping and creating database...")
     db.drop_all()
     db.create_all()
 
     # Users
-    user1 = User(username="john_doe", password="password123")
-    user2 = User(username="jane_smith", password="securepass")
+    user1 = User(username="George_Mukoshi", email="mukoshig@gmail.com", password="password123")
+    user2 = User(username="Dancan_Odhiambo", email="Ddancan@gmail.com", password="securepass")
     db.session.add_all([user1, user2])
     db.session.commit()
 
@@ -20,8 +25,8 @@ with app.app_context():
     db.session.commit()
 
     # Workouts
-    workout1 = Workout(name="Monday Workout", date=date.today(), duration=60, user_id=user1.id)
-    workout2 = Workout(name="Leg Day", date=date.today(), duration=45, user_id=user2.id)
+    workout1 = Workout(name="Monday Workout", date=date.today(), duration=60, notes="Upper body focus", user_id=user1.id)
+    workout2 = Workout(name="Leg Day", date=date.today(), duration=45, notes="Heavy squats", user_id=user2.id)
     db.session.add_all([workout1, workout2])
     db.session.commit()
 
