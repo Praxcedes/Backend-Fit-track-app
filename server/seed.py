@@ -3,8 +3,7 @@ from app import app  # Import app directly, not create_app
 from models import db, User, Workout, Exercise, WorkoutItem
 from datetime import date
 
-# Remove this line - no create_app() function exists
-# app = create_app()
+
 
 with app.app_context():
     print("Dropping and creating database...")
