@@ -1,61 +1,42 @@
-# routes/auth.py
 from flask import Blueprint, request, jsonify
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import create_access_token
 from models import db, User
-from werkzeug.security import generate_password_hash, check_password_hash
-from app import validate_email, validate_password, validate_string, serialize_user
+from validators import validate_email, validate_password, validate_string
 
+bcrypt = Bcrypt()
 auth_bp = Blueprint("auth_bp", __name__)
 
-# Register
-@auth_bp.route("/register", methods=["POST"])
-def register():
-    data = request.get_json() or {}
-    errors = []
+# ----------- SIGNUP -----------
+@auth_bp.post("/signup")
+def signup():
+    data = request.json
 
-    # Validation
-    err = validate_string("Username", data.get("username"))
-    if err: errors.append(err)
+    valid, msg = validate_email(data.get("email"))
+    if not valid: return jsonify({"error": msg}), 400
 
-    err = validate_email(data.get("email"))
-    if err: errors.append(err)
+    valid, msg = validate_string(data.get("username"), "Username")
+    if not valid: return jsonify({"error": msg}), 400
 
-    err = validate_password(data.get("password"))
-    if err: errors.append(err)
+    valid, msg = validate_password(data.get("password"))
+    if not valid: return jsonify({"error": msg}), 400
 
-    if errors:
-        return jsonify({"errors": errors}), 400
+    hashed = bcrypt.generate_password_hash(data["password"]).decode()
+    user = User(username=data["username"], email=data["email"], password_hash=hashed)
 
-    # Check if username/email exists
-    if User.query.filter_by(username=data["username"]).first():
-        return jsonify({"error": "Username already exists."}), 400
-    if User.query.filter_by(email=data["email"]).first():
-        return jsonify({"error": "Email already exists."}), 400
-
-    # Create user
-    new_user = User(
-        username=data["username"],
-        email=data["email"],
-        password=generate_password_hash(data["password"])
-    )
-    db.session.add(new_user)
+    db.session.add(user)
     db.session.commit()
 
-    return jsonify({"message": "User registered successfully", "user": serialize_user(new_user)}), 201
+    return jsonify({"message": "User created successfully"}), 201
 
-
-# Login
-@auth_bp.route("/login", methods=["POST"])
+# ----------- LOGIN -----------
+@auth_bp.post("/login")
 def login():
-    data = request.get_json() or {}
-    email = data.get("email")
-    password = data.get("password")
+    data = request.json
+    user = User.query.filter_by(email=data["email"]).first()
 
-    if not email or not password:
-        return jsonify({"error": "Email and password required."}), 400
+    if not user or not bcrypt.check_password_hash(user.password_hash, data["password"]):
+        return jsonify({"error": "Invalid credentials"}), 401
 
-    user = User.query.filter_by(email=email).first()
-    if not user or not check_password_hash(user.password, password):
-        return jsonify({"error": "Invalid email or password."}), 401
-
-    # For now, return user info (replace with JWT in production)
-    return jsonify({"message": "Login successful", "user": serialize_user(user)}), 200
+    token = create_access_token(identity=user.id)
+    return jsonify({"token": token, "user_id": user.id})
