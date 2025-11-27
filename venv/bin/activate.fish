@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV /home/praxcedeskabeya/development/code/se-prep/phase4/Backend-Fit-track-app/venv
+set -gx VIRTUAL_ENV /home/gmukoshi/Development/code/phase-4/Backend-Fit-track-app/venv
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/"bin $PATH
