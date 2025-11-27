@@ -9,7 +9,7 @@ alias deactivate 'test $?_OLD_VIRTUAL_PATH != 0 && setenv PATH "$_OLD_VIRTUAL_PA
 # Unset irrelevant variables.
 deactivate nondestructive
 
-setenv VIRTUAL_ENV /home/praxcedeskabeya/development/code/se-prep/phase4/Backend-Fit-track-app/venv
+setenv VIRTUAL_ENV /home/gmukoshi/Development/code/phase-4/Backend-Fit-track-app/venv
 
 set _OLD_VIRTUAL_PATH="$PATH"
 setenv PATH "$VIRTUAL_ENV/"bin":$PATH"

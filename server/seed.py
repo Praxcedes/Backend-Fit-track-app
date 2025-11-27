@@ -1,9 +1,7 @@
 # seed.py
-from app import app  # Import app directly, not create_app
+from app import app  
 from models import db, User, Workout, Exercise, WorkoutItem
 from datetime import date
-
-
 
 with app.app_context():
     print("Dropping and creating database...")
