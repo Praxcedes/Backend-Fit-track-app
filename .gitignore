@@ -2,5 +2,16 @@
 __pycache__/
 *.pyc
 
-# Virtual environment
+# Virtual environments
 venv/
+ENV/
+.env/
+
+# Flask instance folder
+instance/
+
+# VS Code
+.vscode/
+
+# Pytest cache
+.pytest_cache/

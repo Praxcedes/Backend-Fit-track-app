@@ -1,8 +1,10 @@
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
-from config import Config
-from models import db
-from validators import (
+from flask_migrate import Migrate
+from flask_cors import CORS
+from .config import Config
+from .models import db
+from .validators import (
     validate_email,
     validate_password,
     validate_string,
@@ -13,50 +15,19 @@ from validators import (
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# Enable CORS for frontend
+CORS(app, origins=["http://localhost:5173"])
+
 db.init_app(app)
 jwt = JWTManager(app)
-
-# ----------- SERIALIZATION HELPERS -------------
-def serialize_user(user):
-    return {
-        "id": user.id,
-        "username": user.username,
-        "email": user.email,
-    }
-
-def serialize_workout(workout):
-    return {
-        "id": workout.id,
-        "name": workout.name,
-        "date": workout.date.isoformat(),
-        "duration": workout.duration,
-        "user_id": workout.user_id
-    }
-
-def serialize_exercise(exercise):
-    return {
-        "id": exercise.id,
-        "name": exercise.name,
-        "muscle_group": exercise.muscle_group,
-        "equipment": exercise.equipment,
-    }
-
-def serialize_workout_item(item):
-    return {
-        "id": item.id,
-        "workout_id": item.workout_id,
-        "exercise_id": item.exercise_id,
-        "sets": item.sets,
-        "reps": item.reps,
-        "weight_lifted": item.weight_lifted
-    }
+migrate = Migrate(app, db)
 
 # ---------------- REGISTER ROUTES ----------------
-from routes.auth import auth_bp
-from routes.workouts import workouts_bp
-from routes.exercises import exercises_bp
-from routes.analytics import analytics_bp
-from routes.profile import profile_bp
+from .routes.auth import auth_bp
+from .routes.workouts import workouts_bp
+from .routes.exercises import exercises_bp
+from .routes.analytics import analytics_bp
+from .routes.profile import profile_bp
 
 app.register_blueprint(auth_bp, url_prefix="/auth")
 app.register_blueprint(workouts_bp, url_prefix="/workouts")
@@ -65,12 +36,23 @@ app.register_blueprint(analytics_bp, url_prefix="/analytics")
 app.register_blueprint(profile_bp, url_prefix="/profile")
 
 # ---------------- DEFAULT ROUTE ----------------
-
 @app.route("/")
 def index():
-    return jsonify({"service": "FitTrack API",
+    return jsonify({
+        "service": "FitTrack API",
         "status": "Operational",
-        "message": "Your fitness journey starts here. Track workouts, monitor progress, and achieve your goals."})
+        "message": "Your fitness journey starts here.",
+        "version": "1.0.0"
+    })
+
+# ---------------- ERROR HANDLERS ----------------
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({"error": "Resource not found"}), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({"error": "Internal server error"}), 500
 
 # ---------------- MAIN ENTRY ----------------
 if __name__ == "__main__":
