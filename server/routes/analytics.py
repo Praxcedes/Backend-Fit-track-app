@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import func
 
-from ..models import db, Workout, WorkoutExercise
+from models import db, Workout, WorkoutExercise
 
 analytics_bp = Blueprint('analytics', __name__)
 

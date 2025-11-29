@@ -2,10 +2,11 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
 
-from ..models import db, Workout, WorkoutExercise
-from ..validators import validate_string, validate_number
+from models import db, Workout, WorkoutExercise
+from validators import validate_string, validate_number
 
 workouts_bp = Blueprint('workouts', __name__)
+
 
 @workouts_bp.route('', methods=['GET'])
 @jwt_required()

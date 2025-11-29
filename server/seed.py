@@ -90,3 +90,4 @@ def seed_exercises():
 
 if __name__ == "__main__":
     seed_exercises()
+    
