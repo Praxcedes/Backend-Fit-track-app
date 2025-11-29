@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # Enable CORS for frontend
-CORS(app, origins=["http://localhost:3000"])
+CORS(app, origins=["http://localhost:5173"])
 
 db.init_app(app)
 jwt = JWTManager(app)
