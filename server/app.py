@@ -1,10 +1,17 @@
+import sys
+import os
+
+# Added parent directory to Python path for direct execution
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_cors import CORS
-from .config import Config
-from .models import db
-from .validators import (
+
+from config import Config
+from models import db
+from validators import (
     validate_email,
     validate_password,
     validate_string,
@@ -16,18 +23,18 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # Enable CORS for frontend
-CORS(app, origins=["http://localhost:5173"])
+CORS(app, origins=["http://localhost:3000"])
 
 db.init_app(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
 
 # ---------------- REGISTER ROUTES ----------------
-from .routes.auth import auth_bp
-from .routes.workouts import workouts_bp
-from .routes.exercises import exercises_bp
-from .routes.analytics import analytics_bp
-from .routes.profile import profile_bp
+from routes.auth import auth_bp
+from routes.workouts import workouts_bp
+from routes.exercises import exercises_bp
+from routes.analytics import analytics_bp
+from routes.profile import profile_bp
 
 app.register_blueprint(auth_bp, url_prefix="/auth")
 app.register_blueprint(workouts_bp, url_prefix="/workouts")
