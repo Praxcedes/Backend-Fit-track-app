@@ -1,37 +1,92 @@
-# seed.py
-from app import app  
-from models import db, User, Workout, Exercise, WorkoutItem
-from datetime import date
+import sys
+import os
 
-with app.app_context():
-    print("Dropping and creating database...")
-    db.drop_all()
-    db.create_all()
+# Add the parent directory to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-    # Users
-    user1 = User(username="George_Mukoshi", email="mukoshig@gmail.com", password="password123")
-    user2 = User(username="Dancan_Odhiambo", email="Ddancan@gmail.com", password="securepass")
-    db.session.add_all([user1, user2])
-    db.session.commit()
+from flask import Flask
+from models import db, Exercise
+from config import Config
 
-    # Exercises
-    bench_press = Exercise(name="Bench Press", muscle_group="Chest", equipment="Barbell")
-    squat = Exercise(name="Squat", muscle_group="Legs", equipment="Barbell")
-    pull_up = Exercise(name="Pull Up", muscle_group="Back", equipment="Bodyweight")
-    db.session.add_all([bench_press, squat, pull_up])
-    db.session.commit()
+# Create app instance for seeding
+app = Flask(__name__)
+app.config.from_object(Config)
+db.init_app(app)
 
-    # Workouts
-    workout1 = Workout(name="Monday Workout", date=date.today(), duration=60, notes="Upper body focus", user_id=user1.id)
-    workout2 = Workout(name="Leg Day", date=date.today(), duration=45, notes="Heavy squats", user_id=user2.id)
-    db.session.add_all([workout1, workout2])
-    db.session.commit()
+def seed_exercises():
+    exercises = [
+        {
+            "name": "Bench Press",
+            "muscle_group": "Chest",
+            "equipment": "Barbell",
+            "instructions": "Lie on bench, grip barbell slightly wider than shoulder width, lower to chest, press up"
+        },
+        {
+            "name": "Squat",
+            "muscle_group": "Legs",
+            "equipment": "Barbell",
+            "instructions": "Bar on upper back, feet shoulder width, descend until thighs parallel, drive up"
+        },
+        {
+            "name": "Deadlift",
+            "muscle_group": "Back",
+            "equipment": "Barbell",
+            "instructions": "Feet under bar, bend knees, grip bar, lift with straight back until standing"
+        },
+        {
+            "name": "Overhead Press",
+            "muscle_group": "Shoulders",
+            "equipment": "Barbell",
+            "instructions": "Bar at shoulder level, press overhead until arms extended, lower with control"
+        },
+        {
+            "name": "Pull-up",
+            "muscle_group": "Back",
+            "equipment": "Bodyweight",
+            "instructions": "Grip bar wider than shoulders, pull body up until chin over bar, lower with control"
+        },
+        {
+            "name": "Push-up",
+            "muscle_group": "Chest",
+            "equipment": "Bodyweight",
+            "instructions": "Plank position, hands under shoulders, lower chest to floor, push back up"
+        },
+        {
+            "name": "Bicep Curl",
+            "muscle_group": "Arms",
+            "equipment": "Dumbbell",
+            "instructions": "Stand holding dumbbells, curl weights toward shoulders, lower with control"
+        },
+        {
+            "name": "Tricep Extension",
+            "muscle_group": "Arms",
+            "equipment": "Cable",
+            "instructions": "Grip cable attachment overhead, extend arms downward, return to start"
+        },
+        {
+            "name": "Lunges",
+            "muscle_group": "Legs",
+            "equipment": "Bodyweight",
+            "instructions": "Step forward, lower until both knees bent 90 degrees, push back to start"
+        },
+        {
+            "name": "Plank",
+            "muscle_group": "Core",
+            "equipment": "Bodyweight",
+            "instructions": "Forearms and toes on ground, keep body straight, hold position"
+        }
+    ]
+    
+    with app.app_context():
+        # Clear existing exercises
+        Exercise.query.delete()
+        
+        for exercise_data in exercises:
+            exercise = Exercise(**exercise_data)
+            db.session.add(exercise)
+        
+        db.session.commit()
+        print(f"✅ Successfully seeded {len(exercises)} exercises!")
 
-    # WorkoutItems
-    wi1 = WorkoutItem(workout_id=workout1.id, exercise_id=bench_press.id, sets=3, reps=10, weight_lifted=80.0)
-    wi2 = WorkoutItem(workout_id=workout2.id, exercise_id=squat.id, sets=4, reps=8, weight_lifted=100.0)
-    wi3 = WorkoutItem(workout_id=workout1.id, exercise_id=pull_up.id, sets=3, reps=12, weight_lifted=0.0)
-    db.session.add_all([wi1, wi2, wi3])
-    db.session.commit()
-
-    print("Database seeded successfully!")
+if __name__ == "__main__":
+    seed_exercises()
