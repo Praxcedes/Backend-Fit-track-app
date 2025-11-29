@@ -2,7 +2,6 @@ from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_cors import CORS
-
 from .config import Config
 from .models import db
 from .validators import (
