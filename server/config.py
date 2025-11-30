@@ -32,6 +32,7 @@ class Config:
     # For now, we allow localhost. You can add more to the list.
     CORS_ORIGINS = [
         "http://localhost:5173", 
+        "https://fittrack-0v68.onrender.com",
         # Add your Render Frontend URL here once deployed, e.g.:
         # "https://fittrack-frontend.onrender.com"
     ]
