@@ -4,90 +4,103 @@ import os
 # Add the parent directory to Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from flask import Flask
+from app import create_app
 from models import db, Exercise
-from config import Config
 
-# Create app instance for seeding
-app = Flask(__name__)
-app.config.from_object(Config)
-db.init_app(app)
-
-def seed_exercises():
-    exercises = [
-        {
-            "name": "Bench Press",
-            "muscle_group": "Chest",
-            "equipment": "Barbell",
-            "instructions": "Lie on bench, grip barbell slightly wider than shoulder width, lower to chest, press up"
-        },
-        {
-            "name": "Squat",
-            "muscle_group": "Legs",
-            "equipment": "Barbell",
-            "instructions": "Bar on upper back, feet shoulder width, descend until thighs parallel, drive up"
-        },
-        {
-            "name": "Deadlift",
-            "muscle_group": "Back",
-            "equipment": "Barbell",
-            "instructions": "Feet under bar, bend knees, grip bar, lift with straight back until standing"
-        },
-        {
-            "name": "Overhead Press",
-            "muscle_group": "Shoulders",
-            "equipment": "Barbell",
-            "instructions": "Bar at shoulder level, press overhead until arms extended, lower with control"
-        },
-        {
-            "name": "Pull-up",
-            "muscle_group": "Back",
-            "equipment": "Bodyweight",
-            "instructions": "Grip bar wider than shoulders, pull body up until chin over bar, lower with control"
-        },
-        {
-            "name": "Push-up",
-            "muscle_group": "Chest",
-            "equipment": "Bodyweight",
-            "instructions": "Plank position, hands under shoulders, lower chest to floor, push back up"
-        },
-        {
-            "name": "Bicep Curl",
-            "muscle_group": "Arms",
-            "equipment": "Dumbbell",
-            "instructions": "Stand holding dumbbells, curl weights toward shoulders, lower with control"
-        },
-        {
-            "name": "Tricep Extension",
-            "muscle_group": "Arms",
-            "equipment": "Cable",
-            "instructions": "Grip cable attachment overhead, extend arms downward, return to start"
-        },
-        {
-            "name": "Lunges",
-            "muscle_group": "Legs",
-            "equipment": "Bodyweight",
-            "instructions": "Step forward, lower until both knees bent 90 degrees, push back to start"
-        },
-        {
-            "name": "Plank",
-            "muscle_group": "Core",
-            "equipment": "Bodyweight",
-            "instructions": "Forearms and toes on ground, keep body straight, hold position"
-        }
-    ]
+def seed_database():
+    """Seed database with unique exercises"""
+    app = create_app()
     
     with app.app_context():
-        # Clear existing exercises
-        Exercise.query.delete()
-        
-        for exercise_data in exercises:
-            exercise = Exercise(**exercise_data)
-            db.session.add(exercise)
-        
-        db.session.commit()
-        print(f"✅ Successfully seeded {len(exercises)} exercises!")
+        try:
+            print("🌱 Starting database seeding...")
+            
+            # Create tables if they don't exist
+            print("🗃️ Ensuring tables exist...")
+            db.create_all()
+            
+            # Define unique exercises with corrected names
+            exercises_data = [
+                {
+                    "name": "Bench Press",
+                    "muscle_group": "Chest",
+                    "instructions": "Lie on bench, grip barbell slightly wider than shoulder width, lower to chest, press up"
+                },
+                {
+                    "name": "Squat", 
+                    "muscle_group": "Legs",
+                    "instructions": "Bar on upper back, feet shoulder width, descend until thighs parallel to ground"
+                },
+                {
+                    "name": "Deadlift",
+                    "muscle_group": "Back",
+                    "instructions": "Bend knees, grip bar, lift with straight back, stand up fully"
+                },
+                {
+                    "name": "Overhead Press",
+                    "muscle_group": "Shoulders", 
+                    "instructions": "Bar at shoulder level, press overhead until arms fully extended"
+                },
+                {
+                    "name": "Pull-up",
+                    "muscle_group": "Back",
+                    "instructions": "Grip bar wider than shoulders, pull body up until chin over bar"
+                },
+                {
+                    "name": "Push-up",
+                    "muscle_group": "Chest",
+                    "instructions": "Plank position, hands under shoulders, lower chest to floor, push back up"
+                },
+                {
+                    "name": "Bicep Curl",
+                    "muscle_group": "Arms",
+                    "instructions": "Stand holding dumbbells, curl weights toward shoulders with palms up"
+                },
+                {
+                    "name": "Tricep Extension",
+                    "muscle_group": "Arms", 
+                    "instructions": "Grip cable attachment overhead, extend arms downwards until straight"
+                },
+                {
+                    "name": "Lunges",
+                    "muscle_group": "Legs",
+                    "instructions": "Step forward, lower until both knees bent 90 degrees, return to start"
+                },
+                {
+                    "name": "Plank",
+                    "muscle_group": "Core",
+                    "instructions": "Forearms and toes on ground, keep body straight, hold position"
+                }
+            ]
+            
+            # Check for existing exercises to avoid duplicates
+            existing_exercises = {ex.name for ex in Exercise.query.all()}
+            new_exercises = []
+            
+            for exercise_data in exercises_data:
+                if exercise_data["name"] not in existing_exercises:
+                    exercise = Exercise(**exercise_data)
+                    new_exercises.append(exercise)
+                    print(f"✅ Adding: {exercise_data['name']}")
+                else:
+                    print(f"⏩ Skipping (already exists): {exercise_data['name']}")
+            
+            # Add only new exercises
+            if new_exercises:
+                db.session.add_all(new_exercises)
+                db.session.commit()
+                print(f"🎉 Successfully added {len(new_exercises)} new exercises!")
+            else:
+                print("📝 No new exercises to add - all exercises already exist.")
+            
+            # Verify final count
+            final_count = Exercise.query.count()
+            print(f"📊 Total exercises in database: {final_count}")
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ Error seeding database: {e}")
+            raise
 
 if __name__ == "__main__":
-    seed_exercises()
-    
+    seed_database()
