@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-
-from models import db, User
+from models import User
 
 profile_bp = Blueprint('profile', __name__)
 
@@ -14,7 +13,7 @@ def get_profile():
         
         if not user:
             return jsonify({"error": "User not found"}), 404
-        
+            
         return jsonify({
             "user": user.to_dict()
         }), 200
