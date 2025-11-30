@@ -1,30 +1,35 @@
-from flask import Blueprint, jsonify
-from models import Exercise  # absolute import
+# server/routes/exercises.py
 
-# Create the Blueprint
+from flask import Blueprint, jsonify
+from flask_jwt_extended import jwt_required
+import traceback
+
+# Absolute import for the Exercise model
+from models import Exercise 
+
 exercises_bp = Blueprint('exercises', __name__)
 
-# GET all exercises
-@exercises_bp.route('', methods=['GET'])
-def get_exercises():
+# GET /exercises/
+@exercises_bp.route('/', methods=['GET'])
+@jwt_required()
+def get_all_exercises():
+    """Returns a list of all available exercises."""
     try:
+        # Fetch all exercises from the database
         exercises = Exercise.query.all()
-        return jsonify({
-            "exercises": [exercise.to_dict() for exercise in exercises]
-        }), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        
+        # Convert each exercise object to its dictionary representation
+        exercise_list = [exercise.to_dict() for exercise in exercises]
+        
+        # NOTE: Your Exercise.to_dict() method handles mapping fields like 
+        # 'title', 'category', 'level', 'duration', and 'images' which the 
+        # frontend needs (e.g., in Workouts.jsx).
+        
+        return jsonify(exercise_list), 200
 
-# GET a single exercise by ID
-@exercises_bp.route('/<int:exercise_id>', methods=['GET'])
-def get_exercise(exercise_id):
-    try:
-        exercise = Exercise.query.get(exercise_id)
-        if not exercise:
-            return jsonify({"error": "Exercise not found"}), 404
-
-        return jsonify({
-            "exercise": exercise.to_dict()
-        }), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print("\n--- TRACEBACK START: get_all_exercises FAILED ---")
+        traceback.print_exc()
+        print(f"CRITICAL ERROR fetching exercises: {e}")
+        print("--- TRACEBACK END ---")
+        return jsonify({"error": "Failed to fetch exercises due to server error."}), 500
