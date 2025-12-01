@@ -1,10 +1,5 @@
+#!/bin/bash
 cd server
-
-echo "Applying migrations..."
-flask db upgrade
-
-echo "Seeding database..."
+python -c "from app import app; from models import db; with app.app_context(): db.create_all()"
 python seed.py
-
-echo "Starting Gunicorn server..."
-exec gunicorn app:app
+gunicorn app:app
