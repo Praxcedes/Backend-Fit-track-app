@@ -1,11 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-# NEW IMPORT for secure password handling
 from werkzeug.security import generate_password_hash, check_password_hash 
 
 db = SQLAlchemy()
 
-# --- HELPER FUNCTION FOR TEMPORARY FRONTEND IMAGES ---
 def get_mock_images(exercise_id):
     """Maps seeded Exercise IDs (1-10) to placeholder image URLs."""
     image_data = {
@@ -52,25 +50,20 @@ def get_mock_images(exercise_id):
     }
     return image_data.get(exercise_id, ["https://images.unsplash.com/photo-1548690312-e3b507d8c110?w=800&fit=crop"])
 
-# --- USER MODEL ---
 class User(db.Model):
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     
-    # ADDED: Email field for profile updates
     email = db.Column(db.String(120), unique=True, nullable=True) 
-    
-    # Renamed to _password_hash to indicate it holds the hash, not the plain password
+  
     _password_hash = db.Column(db.String(255), nullable=False)
-    
-    # Relationships
+ 
     workouts = db.relationship('Workout', backref='user', lazy='noload', cascade='all, delete-orphan')
     water_logs = db.relationship('WaterLog', backref='user', lazy='dynamic', cascade='all, delete-orphan') 
     weight_logs = db.relationship('WeightLog', backref='user', lazy='dynamic', cascade='all, delete-orphan') 
 
-    # PROPERTY SETTER for hashing the password automatically
     @property
     def password(self):
         raise AttributeError('password is not a readable attribute')
@@ -79,7 +72,6 @@ class User(db.Model):
     def password(self, password):
         self._password_hash = generate_password_hash(password)
 
-    # METHOD to check the password against the stored hash
     def check_password(self, password):
         return check_password_hash(self._password_hash, password)
 
@@ -87,11 +79,8 @@ class User(db.Model):
         return {
             "id": self.id,
             "username": self.username,
-            "email": self.email # Included email
+            "email": self.email
         }
-
-# --- METRIC MODELS ---
-# ... (WaterLog and WeightLog models remain unchanged) ...
 
 class WaterLog(db.Model):
     __tablename__ = 'water_logs'
@@ -125,8 +114,6 @@ class WeightLog(db.Model):
             "date": self.date.isoformat()
         }
 
-# --- EXERCISE MODEL ---
-# ... (Exercise model remains unchanged) ...
 
 class Exercise(db.Model):
     __tablename__ = 'exercises'
@@ -139,7 +126,6 @@ class Exercise(db.Model):
     workout_exercises = db.relationship('WorkoutExercise', backref='exercise', lazy=True, cascade='all, delete-orphan')
 
     def to_dict(self):
-        # TEMPORARY MAPPING LOGIC for 'level' and 'duration'
         if self.muscle_group in ['Strength', 'Legs', 'Shoulders']:
             level = 'Medium'
             duration = '45 min'
@@ -152,20 +138,15 @@ class Exercise(db.Model):
             
         return {
             "id": self.id,
-            # MAPPED FIELDS FOR FRONTEND COMPATIBILITY
             "title": self.name,
             "category": self.muscle_group,
             "level": level,
             "duration": duration,
             "images": get_mock_images(self.id),
-            # ORIGINAL FIELDS
             "name": self.name,
             "muscle_group": self.muscle_group,
             "instructions": self.instructions
         }
-
-# --- WORKOUT MODEL ---
-# ... (Workout model remains unchanged) ...
 
 class Workout(db.Model):
     __tablename__ = 'workouts'
@@ -190,8 +171,6 @@ class Workout(db.Model):
             "workout_exercises": [we.to_dict() for we in self.workout_exercises if we] 
         }
 
-# --- WORKOUT EXERCISE MODEL ---
-# ... (WorkoutExercise model remains unchanged) ...
 
 class WorkoutExercise(db.Model):
     __tablename__ = 'workout_exercises'

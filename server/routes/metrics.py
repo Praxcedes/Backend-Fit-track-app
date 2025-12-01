@@ -1,19 +1,13 @@
-# server/routes/metrics.py
-
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime, date, timedelta
 import traceback
 
-# Absolute imports
-# CORRECTION: Added Workout and WorkoutExercise to the import list
 from models import db, WaterLog, WeightLog, Exercise, Workout, WorkoutExercise 
 from sqlalchemy import func 
 
 metrics_bp = Blueprint('metrics', __name__)
 
-# --- POST ENDPOINTS (UNCHANGED) ---
-# POST /metrics/log_water
 @metrics_bp.route('/log_water', methods=['POST'])
 @jwt_required()
 def log_water():
@@ -53,7 +47,6 @@ def log_water():
         print(f"ERROR in log_water: {e}") 
         return jsonify({"error": "Failed to log water intake due to server error."}), 500
 
-# POST /metrics/log_weight
 @metrics_bp.route('/log_weight', methods=['POST'])
 @jwt_required()
 def log_weight():
@@ -106,9 +99,6 @@ def log_weight():
         return jsonify({"error": "Failed to log weight due to server error."}), 500
 
 
-# --- NEW GET ENDPOINTS ---
-
-# GET /metrics/summary
 @metrics_bp.route('/summary', methods=['GET'])
 @jwt_required()
 def get_metrics_summary():
@@ -119,19 +109,17 @@ def get_metrics_summary():
     current_user_id = get_jwt_identity()
     today = date.today()
     
-    # 1. Total Water Intake for Today
     water_intake_today = db.session.query(func.sum(WaterLog.amount_ml)).filter(
         WaterLog.user_id == current_user_id,
         func.date(WaterLog.timestamp) == today
     ).scalar() or 0
     
-    # 2. Latest Weight
     latest_weight_entry = WeightLog.query.filter_by(user_id=current_user_id) \
                                         .order_by(WeightLog.date.desc()) \
                                         .first()
     latest_weight = latest_weight_entry.weight_kg if latest_weight_entry else None
     
-    # 3. Weight History (Last 7 days)
+
     last_week = today - timedelta(days=6)
     weight_history = WeightLog.query.filter(
         WeightLog.user_id == current_user_id,
@@ -140,7 +128,6 @@ def get_metrics_summary():
 
     weight_trend_data = [log.to_dict() for log in weight_history]
     
-    # 4. Personal Records (Max weight lifted per exercise by the user)
     personal_records = {}
     
     try:
@@ -157,18 +144,17 @@ def get_metrics_summary():
          .limit(3) 
 
         for pr in pr_query.all():
-            if pr.max_weight > 0: # Only include PRs with actual weight lifted
+            if pr.max_weight > 0: 
                 personal_records[pr.name] = {
                     'weight': round(pr.max_weight, 1),
-                    'date': 'N/A' # Date lookup is complex, keeping as placeholder for now
+                    'date': 'N/A' #
                 }
     except Exception as e:
-        # Catch errors if workout tables are empty or relations are missing
+
         print(f"Warning: Failed to calculate PRs: {e}")
         personal_records = {}
 
 
-    # 5. Next Workout (Placeholder logic)
     next_workout_placeholder = {
         'id': 1, 
         'name': 'Full Body HIIT',

@@ -12,17 +12,13 @@ def get_workout_stats():
     try:
         current_user_id = get_jwt_identity()
         
-        # Total workouts
         total_workouts = Workout.query.filter_by(user_id=current_user_id).count()
-        
-        # Recent workouts (last 30 days)
         thirty_days_ago = datetime.now().date() - timedelta(days=30)
         recent_workouts = Workout.query.filter(
             Workout.user_id == current_user_id,
             Workout.date >= thirty_days_ago
         ).count()
         
-        # Most frequent exercises
         frequent_exercises = WorkoutExercise.query.join(Workout).filter(
             Workout.user_id == current_user_id
         ).with_entities(
@@ -47,7 +43,6 @@ def get_summary():
     try:
         current_user_id = get_jwt_identity()
         
-        # Simple summary for now
         workout_count = Workout.query.filter_by(user_id=current_user_id).count()
         exercise_count = WorkoutExercise.query.join(Workout).filter(
             Workout.user_id == current_user_id

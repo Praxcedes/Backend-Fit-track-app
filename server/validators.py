@@ -36,7 +36,6 @@ def validate_user_login(data):
 def validate_workout_data(data):
     errors = []
     
-    # Required fields
     if 'name' not in data or not data['name'].strip():
         errors.append("Workout name is required")
     
@@ -48,7 +47,6 @@ def validate_workout_data(data):
         except ValueError:
             errors.append("Date must be in YYYY-MM-DD format")
     
-    # Workout exercises validation
     if 'workout_exercises' not in data or not isinstance(data['workout_exercises'], list):
         errors.append("Workout exercises must be a list")
     elif len(data['workout_exercises']) == 0:
