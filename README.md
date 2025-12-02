@@ -80,7 +80,7 @@ Backend-Fit-track-app/
     │       └── site-packages
     ├── lib64 -> lib
     └── pyvenv.cfg
-    
+
 ```
 
 ---
@@ -151,4 +151,4 @@ Pass this in headers for all protected routes:
 
 - David Kinuthia
 
-- Praxedes Kabeya
+- Praxedes Kabeya
