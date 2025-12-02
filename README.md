@@ -16,6 +16,7 @@ A lightweight Fitness Tracking REST API built featuring JWT Authentication, Work
 
 ##  Project Structure
 
+```
 Backend-Fit-track-app/
 .
 ├── README.md
@@ -79,6 +80,8 @@ Backend-Fit-track-app/
     │       └── site-packages
     ├── lib64 -> lib
     └── pyvenv.cfg
+    
+```
 
 ---
 
@@ -143,6 +146,9 @@ Pass this in headers for all protected routes:
 
 ### Group 4
 - George Mukoshi
+
 - Dancan Odhiambo
+
 - David Kinuthia
+
 - Praxedes Kabeya
