@@ -1,7 +1,3 @@
-@Pracky ✨️🫶 / @David Moringa 
-
-kindly access backend repo and assist update backend repo.Just noticed am 7 commits behind and i might mess.
-
 #  FitTrack API
 
 A lightweight Fitness Tracking REST API built featuring JWT Authentication, Workout Logging, Profile Management, Analytics, and Exercises catalog.
@@ -21,44 +17,86 @@ A lightweight Fitness Tracking REST API built featuring JWT Authentication, Work
 ##  Project Structure
 
 Backend-Fit-track-app/
-│
+.
 ├── README.md
+├── instance
 ├── requirements.txt
-├── server/
-│ ├── app.py
-│ ├── config.py
-│ ├── models.py
-│ ├── seed.py
-│ ├── validators.py
-│ ├── migrations/
-│ │ └── versions/
-│ └── routes/
-│ ├── auth.py
-│ ├── exercises.py
-│ ├── workouts.py
-│ ├── profile.py
-│ └── analytics.py
-└── venv/
+├── server
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── config.cpython-312.pyc
+│   │   ├── models.cpython-312.pyc
+│   │   └── validators.cpython-312.pyc
+│   ├── app.py
+│   ├── config.py
+│   ├── migrations
+│   │   ├── README
+│   │   ├── alembic.ini
+│   │   ├── env.py
+│   │   ├── script.py.mako
+│   │   └── versions
+│   │       └── b8ae682a16a2_master_initialization_of_all_tables_and_.py
+│   ├── models.py
+│   ├── requirements.txt
+│   ├── routes
+│   │   ├── __pycache__
+│   │   │   ├── analytics.cpython-312.pyc
+│   │   │   ├── auth.cpython-312.pyc
+│   │   │   ├── exercises.cpython-312.pyc
+│   │   │   ├── metrics.cpython-312.pyc
+│   │   │   ├── profile.cpython-312.pyc
+│   │   │   └── workouts.cpython-312.pyc
+│   │   ├── analytics.py
+│   │   ├── auth.py
+│   │   ├── exercises.py
+│   │   ├── metrics.py
+│   │   ├── profile.py
+│   │   └── workouts.py
+│   ├── seed.py
+│   ├── start.sh
+│   └── validators.py
+└── venv
+    ├── bin
+    │   ├── Activate.ps1
+    │   ├── activate
+    │   ├── activate.csh
+    │   ├── activate.fish
+    │   ├── alembic
+    │   ├── dotenv
+    │   ├── flask
+    │   ├── mako-render
+    │   ├── pip
+    │   ├── pip3
+    │   ├── pip3.12
+    │   ├── python -> python3
+    │   ├── python3 -> /usr/bin/python3
+    │   └── python3.12 -> python3
+    ├── include
+    │   └── site
+    │       └── python3.12
+    ├── lib
+    │   └── python3.12
+    │       └── site-packages
+    ├── lib64 -> lib
+    └── pyvenv.cfg
 
 ---
 
 ##  Setup Instructions
 
 ### 1. Clone the Repository
-1. git clone <your-repo-url>
+
+1. Fork & git clone <your-repo-url>
 2. cd Backend-Fit-track-app
 3. Create & Activate Virtual Environment
+4. python3 -m venv venv
+5. source venv/bin/activate   
 
-Copy code
-
-python3 -m venv venv
-source venv/bin/activate     # Linux/Mac
-
-2. Install Requirements
+### 2. Install Requirements
 
 - pip install -r requirements.txt
 
-3. Database Setup
+### 3. Database Setup
 
 Initialize migrations (first time only)
 bash
@@ -66,7 +104,7 @@ bash
 - cd server
 - flask db init
 
-Generate migration file
+### 4. Generate migration file
 
 - flask db migrate -m "initial tables"
 - Apply migrations
@@ -74,7 +112,7 @@ Generate migration file
 - Seed the database
 - python seed.py
 
-## Running the Server
+5. ### Running the Server
 From inside /server directory:
 - python app.py
 
@@ -104,7 +142,7 @@ Pass this in headers for all protected routes:
 ## Authors
 
 ### Group 4
-- Praxedes Kabeya
+- George Mukoshi
 - Dancan Odhiambo
 - David Kinuthia
-- George Mukoshi
+- Praxedes Kabeya
